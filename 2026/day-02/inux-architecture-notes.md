@@ -1,117 +1,227 @@
-# Linux Architecture Notes
+# 💻 Day 02 of #90DaysOfDevOps
 
-## What is Linux?
-Linux is an open-source operating system used in servers, cloud platforms, containers, and DevOps environments.
+# Linux Architecture
+
+A Linux system consists of multiple layers:
+
+1. **Hardware**  
+   Physical components like CPU, RAM, Disk, Keyboard, Network devices, etc.
+
+2. **Kernel**  
+   The core part of Linux that directly communicates with hardware and manages:
+    - CPU
+    - Memory
+    - Devices
+    - Processes
+    - File systems
+    - Networking
+
+3. **Shell**  
+   A command-line interface that allows users to interact with the kernel using simple commands.  
+   Examples:
+    - bash
+    - zsh
+    - fish
+
+4. **Applications/User Space**  
+   Software installed and used by users such as:
+    - Browsers
+    - Editors
+    - Databases
+    - Web servers
+    - Monitoring tools
+
+---
+
+# Linux Basics
+
+- Linux itself is technically the **Kernel**
+- It is an **open-source operating system kernel**
+- Different Linux distributions combine the Linux kernel with software packages and utilities
+
+Examples of Linux distributions:
+
+- Ubuntu
+- Fedora
+- Debian
+- Arch Linux
+- CentOS
+
+---
+
+# Important Linux Commands
+
+## Check Kernel Version
+
+```bash
+uname -r
+```
+
+Displays the currently running Linux kernel version.
+
+---
+
+## Check OS Information
+
+```bash
+cat /etc/os-release
+```
+
+Displays Linux distribution details such as:
+
+- Distribution name
+- Version
+- Release information
+
+---
+
+# Linux Directory Structure
+
+Unlike Windows, Linux uses a single root directory represented by `/`.
+
+Common directories:
+
+| Directory | Purpose                                        |
+| --------- | ---------------------------------------------- |
+| `/bin`    | Essential binaries and commands                |
+| `/home`   | User personal files and directories            |
+| `/etc`    | System configuration files                     |
+| `/var`    | Variable data such as logs, cache, spool files |
+| `/tmp`    | Temporary files                                |
+
+---
+
+# Process States in Linux
+
+## Running
+
+Process is currently executing on CPU or ready to execute.
+
+## Sleeping
+
+Process is waiting for an event such as:
+
+- Keyboard input
+- File read
+- Network response
+
+## Stopped
+
+Process execution is paused using a signal or user action.
+
+## Zombie
+
+Process has completed execution, but its process entry still exists until the parent process reads its exit status.
+
+## Orphan
+
+A process whose parent process has terminated.  
+It gets adopted by the system process (`init/systemd`).
+
+---
+
+# Common Linux Commands
+
+| Command    | Description                         |
+| ---------- | ----------------------------------- |
+| `pwd`      | Show present working directory      |
+| `cd`       | Change directory                    |
+| `htop`     | Interactive process monitoring tool |
+| `cat`      | Display file contents               |
+| `uname -r` | Display kernel version              |
 
 ---
 
 # Core Components of Linux
 
-## 1. Kernel
-The kernel is the core part of Linux that directly interacts with hardware.
+## Kernel
 
-### Responsibilities:
-- CPU management
-- Memory management
-- Process scheduling
-- Device management
-- File system handling
+Core component that directly interacts with hardware and manages system resources.
 
-The kernel works as a bridge between hardware and applications.
+## User Space
+
+Area where user applications run:
+
+- Browser
+- Shell
+- Editors
+- Services
+
+Applications access hardware through the kernel.
+
+## init/systemd
+
+The first userspace process started by the kernel (PID 1).
+
+Responsibilities:
+
+- Starts services during boot
+- Manages services/processes
+- Handles orphan processes
+- Cleans zombie processes
 
 ---
 
-## 2. User Space
-User space is where users and applications run.
+# How Processes Are Created and Managed
 
-### Examples:
-- Bash shell
-- VS Code
-- Python programs
+1. A parent process creates a child process using:
+
+```c
+fork()
+```
+
+2. The child process may load a new program using:
+
+```c
+exec()
+```
+
+3. The kernel manages:
+
+- CPU scheduling
+- Memory allocation
+- Process priorities
+- Process states
+
+---
+
+# What is systemd?
+
+`systemd` is the modern Linux service and system manager.
+
+## Responsibilities
+
+- Starts services during system boot
+- Manages background services
+- Restarts failed services automatically
+- Handles:
+    - Logging
+    - Timers
+    - Networking
+    - Service dependencies
+
+Examples of services:
+
+- SSH
 - Nginx
-- Docker
-
-Applications cannot directly access hardware.
-They communicate with the kernel using system calls.
+- Apache
+- Databases
 
 ---
 
-## 3. init / systemd
-After booting, Linux starts the first process called `init` (PID 1).
+# Why systemd Matters
 
-Modern Linux distributions use `systemd`.
+- Faster boot process
+- Better service management
+- Automatic recovery of failed services
+- Centralized service control using:
 
-### systemd Responsibilities:
-- Starts system services
-- Manages background processes
-- Handles service restart
-- Collects logs
-- Controls boot sequence
-
-### Useful systemd Commands
-bash
-systemctl status nginx
-systemctl start nginx
-systemctl stop nginx
-systemctl restart nginx
-journalctl -u nginx
-
-Linux Process Management
-What is a Process?
-
-A process is a running instance of a program.
-
-Examples:
-
-Chrome browser
-Bash terminal
-Python script
-
-Each process has:
-
-PID (Process ID)
-Parent Process
-Memory allocation
-Process state
-
-Process Creation
-
-Linux mainly uses:
-
-fork() → create child process
-exec() → load new program into process
+```bash
+systemctl
+```
 
 Example:
-When running ls command:
 
-Shell creates child process
-Child executes ls
-
-Process States
-State	Meaning
-Running	Currently using CPU
-Sleeping	Waiting for resource/input
-Stopped	Paused process
-Zombie	Process finished but not cleaned
-Orphan	Parent process terminated
-
-Zombie processes waste process table entries and should be cleaned properly.
-
-Why systemd Matters in DevOps
-
-Understanding systemd helps to:
-
-Troubleshoot failed services
-Restart applications safely
-Analyze logs during incidents
-Manage production servers
-Automate service startup
-
-Most production Linux servers use systemd for service management.
-
-Key Learning Summary
-Kernel manages hardware and system resources
-User space runs applications
-systemd manages services and boot process
-Processes have different states and lifecycle
-Linux troubleshooting starts with understanding processes and logs
+```bash
+systemctl status ssh
+```
